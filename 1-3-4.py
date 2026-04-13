@@ -63,20 +63,44 @@ df = pd.DataFrame({
     'Spam':  ['Yes','Yes','No','No','Yes','No','No','Yes']
 })
 
+print("Dataset:\n", df)
+
 # Test email
 offer, money = 'Yes', 'Yes'
-
-for label in ['Yes', 'No']:
-    subset = df[df['Spam'] == label]
-    prob   = (len(subset) / len(df)) * \
-             (len(subset[subset['Offer'] == offer]) / len(subset)) * \
-             (len(subset[subset['Money'] == money]) / len(subset))
-    print(f"P(Spam={label} | X) = {prob:.4f}")
 
 spam    = df[df['Spam']=='Yes']
 notspam = df[df['Spam']=='No']
 
-p_spam    = (len(spam)/len(df))    * (len(spam[spam['Offer']==offer])/len(spam))       * (len(spam[spam['Money']==money])/len(spam))
-p_notspam = (len(notspam)/len(df)) * (len(notspam[notspam['Offer']==offer])/len(notspam)) * (len(notspam[notspam['Money']==money])/len(notspam))
+# Prior Probabilities
+P_spam    = len(spam)    / len(df)
+P_notspam = len(notspam) / len(df)
+
+print("\nPrior Probabilities")
+print("P(Spam) =",    P_spam)
+print("P(NotSpam) =", P_notspam)
+
+# Likelihood Probabilities
+P_offer_spam    = len(spam[spam['Offer']       == offer]) / len(spam)
+P_money_spam    = len(spam[spam['Money']       == money]) / len(spam)
+P_offer_notspam = len(notspam[notspam['Offer'] == offer]) / len(notspam)
+P_money_notspam = len(notspam[notspam['Money'] == money]) / len(notspam)
+
+print("\nLikelihood Probabilities")
+print("P(Offer=Yes | Spam) =",    P_offer_spam)
+print("P(Money=Yes | Spam) =",    P_money_spam)
+print("P(Offer=Yes | NotSpam) =", P_offer_notspam)
+print("P(Money=Yes | NotSpam) =", P_money_notspam)
+
+# Posterior Probabilities
+P_spam_X    = P_spam    * P_offer_spam    * P_money_spam
+P_notspam_X = P_notspam * P_offer_notspam * P_money_notspam
+
+print("\nPosterior Probabilities")
+print("P(Spam | X) =",    P_spam_X)
+print("P(NotSpam | X) =", P_notspam_X)
+
+# Final Prediction
+print("\nFinal Prediction:")
+print("Email is Spam" if P_spam_X > P_notspam_X else "Email is Not Spam")
 
 print("\nResult:", "SPAM" if p_spam > p_notspam else "NOT SPAM")
